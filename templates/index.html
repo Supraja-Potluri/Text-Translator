@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Language Translator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Language Translator</h1>
+        <textarea id="inputText" placeholder="Enter text"></textarea>
+        <input type="text" id="sourceLang" placeholder="Source Language (e.g. en or auto)" value="auto">
+        <input type="text" id="targetLang" placeholder="Target Language (e.g. te)">
+        <button onclick="translateText()">Translate</button>
+        
+        <div>
+            <p><strong>Original:</strong> <span id="originalResult"></span></p>
+            <p><strong>Translated:</strong> <span id="translatedResult"></span></p>
+            <p id="error" style="color:red;"></p>
+        </div>
+    </div>
+
+    <script>
+        async function translateText() {
+            const text = document.getElementById('inputText').value;
+            const sourceLang = document.getElementById('sourceLang').value;
+            const targetLang = document.getElementById('targetLang').value;
+
+            const response = await fetch('/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text, source_lang: sourceLang, target_lang: targetLang })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                document.getElementById('originalResult').textContent = data.original_text;
+                document.getElementById('translatedResult').textContent = data.translated_text;
+                document.getElementById('error').textContent = '';
+            } else {
+                document.getElementById('error').textContent = data.error;
+            }
+        }
+    </script>
+</body>
+</html>
